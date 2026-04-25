@@ -647,6 +647,13 @@ function saveRecord() {
   }
 }
 
+function doSaveRecord(data) {
+  callServer('saveRecord', data, function() {
+    alert('기록이 저장됐어요!');
+    initRecordTab();
+  });
+}
+
 function uploadPhotos(f1, f2, cb) {
   const results = ['', ''];
   let done = 0;
