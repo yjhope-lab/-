@@ -582,9 +582,25 @@ function previewPhoto(input, previewId) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    const img = document.getElementById(previewId);
+    const img = document.createElement('img');
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxSize = 800;
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.6);
+      const preview = document.getElementById(previewId);
+      preview.src = compressed;
+      preview.style.display = 'block';
+      input._compressed = compressed.split(',')[1];
+    };
     img.src = e.target.result;
-    img.style.display = 'block';
   };
   reader.readAsDataURL(file);
 }
@@ -638,34 +654,23 @@ function uploadPhotos(f1, f2, cb) {
   if (total === 0) { cb(results); return; }
   function tryUpload(file, idx) {
     if (!file) { done++; if (done === total) cb(results); return; }
-    const reader = new FileReader();
-    reader.onload = e => {
-      const b64 = e.target.result.split(',')[1];
-      callServer('uploadPhoto', {
-        studentId: currentStudent.id,
-        date: getTodayStr(),
-        photoIndex: idx + 1,
-        photoData: b64,
-        mimeType: file.type
-      }, function(res) {
-        results[idx] = (res && res.url) ? res.url : '';
-        done++;
-        if (done === total) cb(results);
-      });
-    };
-    reader.readAsDataURL(file);
+    const b64 = file._compressed || '';
+    if (!b64) { done++; if (done === total) cb(results); return; }
+    callServer('uploadPhoto', {
+      studentId: currentStudent.id,
+      date: getTodayStr(),
+      photoIndex: idx + 1,
+      photoData: b64,
+      mimeType: 'image/jpeg'
+    }, function(res) {
+      results[idx] = (res && res.url) ? res.url : '';
+      done++;
+      if (done === total) cb(results);
+    });
   }
   if (f1) tryUpload(f1, 0);
   if (f2) tryUpload(f2, 1);
 }
-
-function doSaveRecord(data) {
-  callServer('saveRecord', data, function() {
-    alert('기록이 저장됐어요!');
-    initRecordTab();
-  });
-}
-
 function renderRecordCard(r) {
   if (!r) return '<p class="empty">기록 없음</p>';
   const checkEmoji = {'done':'✅','partial':'⚡','fail':'❌'};
