@@ -644,8 +644,13 @@ function saveRecord() {
     reflect2: showReflect ? document.getElementById('reflect2').value.trim() : '',
   };
 
-  if (photo1File || photo2File) {
-    uploadPhotos(photo1File, photo2File, function(urls) {
+ const photo1Input = document.getElementById('photo1');
+const photo2Input = document.getElementById('photo2');
+const photo1File = photo1Input.files[0];
+const photo2File = photo2Input.files[0];
+
+if (photo1File || photo2File) {
+    uploadPhotos(photo1Input, photo2Input, function(urls) {
       data.photo1Url = urls[0] || '';
       data.photo2Url = urls[1] || '';
       doSaveRecord(data);
@@ -671,7 +676,7 @@ function uploadPhotos(f1, f2, cb) {
   if (total === 0) { cb(results); return; }
   function tryUpload(file, idx) {
     if (!file) { done++; if (done === total) cb(results); return; }
-    const b64 = input.dataset ? input.dataset.compressed : '';
+    const b64 = file && file.dataset ? file.dataset.compressed : '';
     if (!b64) { done++; if (done === total) cb(results); return; }
     callServer('uploadPhoto', {
       studentId: currentStudent.id,
