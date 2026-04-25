@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>뇌과학여행 — 습관 기록</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh}
+.app{max-width:430px;margin:0 auto;background:#f5f5f0;min-height:100vh}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+.header{background:#fff;padding:16px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.header h2{font-size:17px;font-weight:600;color:#1a1a1a}
+.back-btn{background:none;border:none;font-size:20px;cursor:pointer;color:#666;padding:4px;line-height:1}
+.body{padding:16px;padding-bottom:40px}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:#888;letter-spacing:0.04em;margin-bottom:12px;text-transform:uppercase}
+label{font-size:14px;color:#555;display:block;margin-bottom:5px;margin-top:14px}
+label:first-child{margin-top:0}
+input[type=text],input[type=password],input[type=number],textarea,select{width:100%;font-size:15px;color:#1a1a1a;background:#f8f8f6;border:1px solid #e8e8e4;border-radius:10px;padding:11px 13px;font-family:inherit;resize:none;outline:none;transition:border-color 0.15s}
+input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{border-color:#4a7c59}
+textarea{min-height:64px}
+.btn{width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;border:none;margin-top:8px;transition:opacity 0.15s}
+.btn:active{opacity:0.75}
+.btn-primary{background:#4a7c59;color:#fff}
+.btn-secondary{background:#f0f0ec;color:#333}
+.btn-sm{width:auto;padding:8px 16px;font-size:14px;font-weight:500;margin-top:0}
+.start-hero{padding:60px 32px 32px;text-align:center}
+.brain-icon{width:72px;height:72px;border-radius:20px;background:#e8f0eb;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:36px}
+.start-hero h1{font-size:24px;font-weight:700;margin-bottom:8px}
+.start-hero p{font-size:15px;color:#888;margin-bottom:40px}
+.tab-bar{display:flex;background:#fff;border-bottom:1px solid #eee;position:sticky;top:57px;z-index:9}
+.tab{flex:1;padding:13px 0;text-align:center;font-size:13px;font-weight:500;color:#999;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.tab.active{color:#4a7c59;border-bottom-color:#4a7c59}
+.check-row{display:flex;gap:8px;margin-top:8px}
+.check-btn{flex:1;padding:10px 4px;border-radius:10px;border:1.5px solid #e8e8e4;background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:#666;transition:all 0.15s;text-align:center}
+.check-btn.done{border-color:#4a7c59;background:#e8f0eb;color:#2d5a3d}
+.check-btn.partial{border-color:#f0a500;background:#fff8e6;color:#8a5a00}
+.check-btn.fail{border-color:#e05c5c;background:#fdf0f0;color:#8a2020}
+.goal-stripe{border-left:3px solid #4a7c59;padding:8px 12px;margin-bottom:10px;background:#f8faf8;border-radius:0 8px 8px 0}
+.goal-stripe.g2{border-color:#5b8fa8}
+.goal-stripe.g3{border-color:#c8943a}
+.goal-label{font-size:11px;font-weight:600;color:#888;margin-bottom:2px}
+.goal-text{font-size:14px;color:#1a1a1a}
+.progress-wrap{background:#f0f0ec;border-radius:99px;height:6px;margin-top:6px}
+.progress-fill{height:100%;border-radius:99px;background:#4a7c59;transition:width 0.3s}
+.week-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.wchip{padding:6px 14px;border-radius:99px;font-size:13px;border:1.5px solid #e8e8e4;color:#777;cursor:pointer;background:#fff;transition:all 0.15s}
+.wchip.sel{background:#4a7c59;color:#fff;border-color:#4a7c59}
+.student-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #f0f0ec;cursor:pointer}
+.student-row:last-child{border-bottom:none}
+.s-name{font-size:15px;font-weight:600}
+.s-sub{font-size:12px;color:#999;margin-top:2px}
+.score-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f0}
+.score-row:last-child{border-bottom:none}
+.score-label{font-size:14px;color:#444}
+.score-max{font-size:12px;color:#aaa}
+.score-input{width:60px;text-align:center;font-size:15px;font-weight:600;padding:7px 8px}
+.alert{border-radius:12px;padding:13px 16px;font-size:14px;margin-bottom:14px;line-height:1.5}
+.alert-green{background:#e8f0eb;color:#2d5a3d}
+.alert-amber{background:#fff3dc;color:#7a4f00}
+.reflect-q{font-size:14px;font-weight:600;color:#333;margin-bottom:8px;line-height:1.4}
+.reflect-hint{font-size:12px;color:#aaa;margin-bottom:6px}
+.photo-area{border:2px dashed #d8d8d4;border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#fafaf8;margin-top:8px}
+.photo-area p{font-size:13px;color:#aaa;margin-top:6px}
+.photo-preview{width:100%;border-radius:10px;margin-top:10px;display:none}
+.date-lock{background:#e8f0eb;border-radius:10px;padding:10px 14px;font-size:13px;color:#2d5a3d;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.empty{text-align:center;padding:40px 20px;color:#bbb;font-size:14px}
+.score-total{background:#4a7c59;color:#fff;border-radius:12px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.score-total-label{font-size:14px;font-weight:500}
+.score-total-val{font-size:22px;font-weight:700}
+.divider{height:1px;background:#f0f0ec;margin:14px 0}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:#fff;border-radius:12px;padding:14px;text-align:center}
+.stat-num{font-size:26px;font-weight:700;color:#4a7c59}
+.stat-label{font-size:12px;color:#aaa;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="screen active" id="screen-start">
+  <div class="start-hero">
+    <div class="brain-icon">🧠</div>
+    <h1>뇌과학여행</h1>
+    <p>5주 습관 실천 기록</p>
+    <button class="btn btn-primary" onclick="go('screen-login-student')">학생으로 입장</button>
+    <button class="btn btn-secondary" style="margin-top:10px" onclick="go('screen-login-prof')">교수님으로 입장</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-login-student">
+  <div class="header">
+    <button class="back-btn" onclick="go('screen-start')">←</button>
+    <h2>학생 로그인</h2>
+  </div>
+  <div class="body">
+    <div class="card">
+      <label>학번</label>
+      <input type="text" id="s-id" placeholder="예: 20210001" inputmode="numeric">
+      <label>이름</label>
+      <input type="text" id="s-name" placeholder="홍길동">
+      <button class="btn btn-primary" style="margin-top:18px" onclick="studentLogin()">입장하기</button>
+    </div>
+    <p style="text-align:center;font-size:13px;color:#bbb;margin-top:8px">처음 입장하면 자동으로 등록돼요</p>
+  </div>
+</div>
+
+<div class="screen" id="screen-student-main">
+  <div class="header">
+    <div>
+      <h2 id="s-welcome-name">안녕하세요</h2>
+      <p style="font-size:12px;color:#aaa" id="s-week-label">1주차 진행 중</p>
+    </div>
+    <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="go('screen-start')">로그아웃</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" id="tab-btn-goals" onclick="setTab('goals')">내 목표</div>
+    <div class="tab" id="tab-btn-record" onclick="setTab('record')">오늘 기록</div>
+    <div class="tab" id="tab-btn-history" onclick="setTab('history')">히스토리</div>
+    <div class="tab" id="tab-btn-final" onclick="setTab('final')">최종성찰</div>
+  </div>
+  <div class="body">
+    <div id="tab-goals">
+      <div id="goals-display" style="display:none">
+        <div class="alert alert-green">목표가 설정됐어요. 5주 동안 화이팅!</div>
+        <div class="card">
+          <div class="card-title">나의 3가지 목표</div>
+          <div id="goals-summary"></div>
+        </div>
+        <button class="btn btn-secondary" onclick="showGoalEdit()">목표 수정하기</button>
+      </div>
+      <div id="goals-edit">
+        <div class="alert alert-amber">목표는 처음 한 번 설정하면 돼요. 신중하게 골라보세요!</div>
+        <div class="card">
+          <div class="card-title">목표 1 — 신체 습관</div>
+          <label>영역</label>
+          <select id="g1-area"><option>운동</option><option>식사</option><option>수면</option></select>
+          <label>구체적 목표 (SMART)</label>
+          <input type="text" id="g1-s" placeholder="예: 매일 30분 걷기, 주 5회">
+          <label>측정 방법</label>
+          <input type="text" id="g1-m" placeholder="예: 만보기로 7000보 이상 확인">
+        </div>
+        <div class="card">
+          <div class="card-title">목표 2 — 신체 습관</div>
+          <label>영역</label>
+          <select id="g2-area"><option>식사</option><option>운동</option><option>수면</option></select>
+          <label>구체적 목표 (SMART)</label>
+          <input type="text" id="g2-s" placeholder="예: 오후 9시 이후 야식 끊기">
+          <label>측정 방법</label>
+          <input type="text" id="g2-m" placeholder="예: 야식 0회/주">
+        </div>
+        <div class="card">
+          <div class="card-title">목표 3 — 감사일기</div>
+          <label>나만의 감사일기 목표</label>
+          <input type="text" id="g3-s" placeholder="예: 매일 자기 전 감사한 일 3가지 적기">
+        </div>
+        <button class="btn btn-primary" onclick="saveGoals()">목표 저장하기</button>
+      </div>
+    </div>
+
+    <div id="tab-record" style="display:none">
+      <div id="already-recorded" style="display:none">
+        <div class="alert alert-green">오늘 기록을 이미 완료했어요! 내일 또 만나요 😊</div>
+        <div class="card" id="today-record-view"></div>
+      </div>
+      <div id="record-form">
+        <div class="date-lock">📅 오늘만 기록 가능 — <strong id="today-display"></strong></div>
+        <div class="card">
+          <div class="card-title" id="rec-g1-title">목표 1 실천</div>
+          <div class="check-row">
+            <button class="check-btn" id="ck1-done" onclick="setCheck(1,'done')">✅ 완료</button>
+            <button class="check-btn" id="ck1-partial" onclick="setCheck(1,'partial')">⚡ 부분</button>
+            <button class="check-btn" id="ck1-fail" onclick="setCheck(1,'fail')">❌ 못함</button>
+          </div>
+          <label style="margin-top:12px">한 줄 메모 (선택)</label>
+          <textarea id="rec-g1-memo" placeholder="오늘 어떻게 실천했나요?" rows="2"></textarea>
+          <label>인증사진 (선택)</label>
+          <div class="photo-area" onclick="document.getElementById('photo1').click()">
+            <span style="font-size:24px">📷</span>
+            <p>탭해서 사진 첨부</p>
+          </div>
+          <img id="photo1-preview" class="photo-preview">
+          <input type="file" id="photo1" accept="image/*" style="display:none" onchange="handlePhoto(this,'photo1-preview')">
+        </div>
+        <div class="card">
+          <div class="card-title" id="rec-g2-title">목표 2 실천</div>
+          <div class="check-row">
+            <button class="check-btn" id="ck2-done" onclick="setCheck(2,'done')">✅ 완료</button>
+            <button class="check-btn" id="ck2-partial" onclick="setCheck(2,'partial')">⚡ 부분</button>
+            <button class="check-btn" id="ck2-fail" onclick="setCheck(2,'fail')">❌ 못함</button>
+          </div>
+          <label style="margin-top:12px">한 줄 메모 (선택)</label>
+          <textarea id="rec-g2-memo" placeholder="오늘 어떻게 실천했나요?" rows="2"></textarea>
+          <label>인증사진 (선택)</label>
+          <div class="photo-area" onclick="document.getElementById('photo2').click()">
+            <span style="font-size:24px">📷</span>
+            <p>탭해서 사진 첨부</p>
+          </div>
+          <img id="photo2-preview" class="photo-preview">
+          <input type="file" id="photo2" accept="image/*" style="display:none" onchange="handlePhoto(this,'photo2-preview')">
+        </div>
+        <div class="card">
+          <div class="card-title">오늘의 감사일기</div>
+          <p style="font-size:13px;color:#aaa;margin-bottom:10px">작은 것도 좋아요. 짧게 세 가지만!</p>
+          <label>① 감사한 일</label>
+          <input type="text" id="thanks1" placeholder="">
+          <label>② 감사한 일</label>
+          <input type="text" id="thanks2" placeholder="">
+          <label>③ 감사한 일</label>
+          <input type="text" id="thanks3" placeholder="">
+        </div>
+        <div id="weekly-reflect-section" style="display:none">
+          <div class="card" style="border:2px solid #4a7c59">
+            <div class="card-title" style="color:#4a7c59">이번 주 마무리 성찰</div>
+            <div class="reflect-q">이번 주 몸이나 기분에서 느낀 변화는?</div>
+            <textarea id="reflect1" placeholder="한두 문장이면 충분해요" rows="2"></textarea>
+            <div class="reflect-q" style="margin-top:14px">신경가소성·전전두엽과 연결해서 내 변화를 설명해본다면?</div>
+            <div class="reflect-hint">수업에서 배운 개념과 나의 경험을 연결해보세요</div>
+            <textarea id="reflect2" placeholder="예: 반복 실천이 쌓이면서 습관 회로가 강화되는 것 같다" rows="2"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveRecord()">기록 저장하기</button>
+        <p style="text-align:center;font-size:12px;color:#bbb;margin-top:10px">오늘 기록은 하루에 한 번만 저장할 수 있어요</p>
+      </div>
+    </div>
+
+    <div id="tab-history" style="display:none">
+      <div class="week-chips" id="hist-weeks"></div>
+      <div id="history-content"></div>
+    </div>
+
+    <div id="tab-final" style="display:none">
+      <div id="final-submitted" style="display:none">
+        <div class="alert alert-green">최종 성찰을 제출했어요. 수고했습니다! 🎉</div>
+        <div class="card" id="final-view"></div>
+      </div>
+      <div id="final-form">
+        <div class="alert alert-amber">5주 과제를 마무리하는 성찰이에요. 솔직하게 써주세요.</div>
+        <div class="card">
+          <div class="reflect-q">① 5주간 나에게 일어난 가장 큰 변화</div>
+          <textarea id="final1" placeholder="행동, 몸, 감정 어떤 것이든 좋아요" rows="3"></textarea>
+          <div class="reflect-q" style="margin-top:16px">② 전전두엽·신경가소성 관점에서 내 변화 돌아보기</div>
+          <div class="reflect-hint">수업에서 배운 뇌과학 개념으로 나의 경험을 설명해보세요</div>
+          <textarea id="final2" placeholder="예: 반복 실천을 통해 신경 회로가 강화되었고..." rows="3"></textarea>
+          <div class="reflect-q" style="margin-top:16px">③ 앞으로 유지할 한 가지와 이유</div>
+          <textarea id="final3" placeholder="가장 의미 있었던 습관 한 가지와 왜 계속할지" rows="3"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="submitFinal()">최종 성찰 제출하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-login-prof">
+  <div class="header">
+    <button class="back-btn" onclick="go('screen-start')">←</button>
+    <h2>교수님 로그인</h2>
+  </div>
+  <div class="body">
+    <div class="card">
+      <label>비밀번호</label>
+      <input type="password" id="prof-pw" placeholder="">
+      <button class="btn btn-primary" style="margin-top:18px" onclick="profLogin()">입장하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-prof-main">
+  <div class="header">
+    <h2>수강생 현황</h2>
+    <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="go('screen-start')">로그아웃</button>
+  </div>
+  <div class="body">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">등록 학생</div></div>
+      <div class="stat-card"><div class="stat-num" id="p-records">0</div><div class="stat-label">총 기록</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">학생 목록</div>
+      <div id="student-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-detail">
+  <div class="header">
+    <button class="back-btn" onclick="go('screen-prof-main')">←</button>
+    <h2 id="detail-header">학생 기록</h2>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" id="dtab-btn-drec" onclick="setDetailTab('drec')">기록</div>
+    <div class="tab" id="dtab-btn-dfinal" onclick="setDetailTab('dfinal')">최종성찰</div>
+    <div class="tab" id="dtab-btn-dscore" onclick="setDetailTab('dscore')">점수입력</div>
+  </div>
+  <div class="body">
+    <div id="dtab-drec">
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">목표</div>
+        <div id="detail-goals"></div>
+      </div>
+      <div class="week-chips" id="detail-week-chips"></div>
+      <div id="detail-records"></div>
+    </div>
+    <div id="dtab-dfinal" style="display:none">
+      <div id="detail-final-content"></div>
+    </div>
+    <div id="dtab-dscore" style="display:none">
+      <div class="card">
+        <div class="card-title">항목별 점수</div>
+        <div class="score-row">
+          <div><div class="score-label">자기진단</div><div class="score-max">만점 15점</div></div>
+          <input type="number" class="score-input" id="sc1" min="0" max="15" placeholder="0" oninput="updateTotal()">
+        </div>
+        <div class="score-row">
+          <div><div class="score-label">목표설정</div><div class="score-max">만점 10점</div></div>
+          <input type="number" class="score-input" id="sc2" min="0" max="10" placeholder="0" oninput="updateTotal()">
+        </div>
+        <div class="score-row">
+          <div><div class="score-label">실행현황</div><div class="score-max">만점 35점</div></div>
+          <input type="number" class="score-input" id="sc3" min="0" max="35" placeholder="0" oninput="updateTotal()">
+        </div>
+        <div class="score-row">
+          <div><div class="score-label">실행결과</div><div class="score-max">만점 25점</div></div>
+          <input type="number" class="score-input" id="sc4" min="0" max="25" placeholder="0" oninput="updateTotal()">
+        </div>
+        <div class="score-row">
+          <div><div class="score-label">감사성찰</div><div class="score-max">만점 15점</div></div>
+          <input type="number" class="score-input" id="sc5" min="0" max="15" placeholder="0" oninput="updateTotal()">
+        </div>
+        <div class="score-total">
+          <span class="score-total-label">합계</span>
+          <span class="score-total-val" id="sc-total">0 / 100점</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">교수님 피드백</div>
+        <textarea id="prof-feedback" placeholder="학생에게 전달할 피드백을 남겨주세요" rows="4"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveScore()">점수 & 피드백 저장</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+const PROF_PW = 'prof1234';
+
+let currentStudent = null;
+let currentDetailKey = null;
+let currentDetailWeek = 1;
+let checks = {1: null, 2: null};
+let photoData = {1: '', 2: ''};
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'screen-prof-main') loadProfDashboard();
+}
+
+function setTab(tab) {
+  ['goals','record','history','final'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? '' : 'none';
+    document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'record') initRecordTab();
+  if (tab === 'history') renderHistory(1);
+  if (tab === 'final') initFinalTab();
+}
+
+function setDetailTab(tab) {
+  ['drec','dfinal','dscore'].forEach(t => {
+    document.getElementById('dtab-' + t).style.display = t === tab ? '' : 'none';
+    document.getElementById('dtab-btn-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'dfinal') renderDetailFinal();
+  if (tab === 'dscore') loadScore();
+}
+
+function updateTotal() {
+  const total = ['sc1','sc2','sc3','sc4','sc5'].reduce((s,id) => s + (parseInt(document.getElementById(id).value)||0), 0);
+  document.getElementById('sc-total').textContent = total + ' / 100점';
+}
+
+function getTodayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function formatDate(str) {
+  if (!str) return '';
+  const [y,m,d] = str.split('-');
+  return m + '월 ' + d + '일';
+}
+
+function studentLogin() {
+  const id = document.getElementById('s-id').value.trim();
+  const name = document.getElementById('s-name').value.trim();
+  if (!id || !name) { alert('학번과 이름을 모두 입력해주세요.'); return; }
+  currentStudent = { id, name };
+  document.getElementById('s-welcome-name').textContent = name + '님';
+  document.getElementById('today-display').textContent = formatDate(getTodayStr());
+  go('screen-student-main');
+  setTab('goals');
+  loadGoals();
+}
+
+function loadGoals() {
+  callServer('getGoals', { studentId: currentStudent.id, studentName: currentStudent.name }, function(res) {
+    if (res && res.goals) {
+      showGoalDisplay(res.goals);
+    } else {
+      document.getElementById('goals-edit').style.display = '';
+      document.getElementById('goals-display').style.display = 'none';
+    }
+  });
+}
+
+function showGoalDisplay(goals) {
+  document.getElementById('goals-edit').style.display = 'none';
+  document.getElementById('goals-display').style.display = '';
+  document.getElementById('goals-summary').innerHTML =
+    '<div class="goal-stripe"><div class="goal-label">목표 1 — ' + goals.g1Area + '</div><div class="goal-text">' + goals.g1S + '</div></div>' +
+    '<div class="goal-stripe g2"><div class="goal-label">목표 2 — ' + goals.g2Area + '</div><div class="goal-text">' + goals.g2S + '</div></div>' +
+    '<div class="goal-stripe g3"><div class="goal-label">목표 3 — 감사일기</div><div class="goal-text">' + goals.g3S + '</div></div>';
+  document.getElementById('rec-g1-title').textContent = '목표 1 — ' + goals.g1Area;
+  document.getElementById('rec-g2-title').textContent = '목표 2 — ' + goals.g2Area;
+  window._goals = goals;
+}
+
+function showGoalEdit() {
+  document.getElementById('goals-edit').style.display = '';
+  document.getElementById('goals-display').style.display = 'none';
+}
+
+function saveGoals() {
+  const g = {
+    g1Area: document.getElementById('g1-area').value,
+    g1S: document.getElementById('g1-s').value.trim(),
+    g1M: document.getElementById('g1-m').value.trim(),
+    g2Area: document.getElementById('g2-area').value,
+    g2S: document.getElementById('g2-s').value.trim(),
+    g2M: document.getElementById('g2-m').value.trim(),
+    g3S: document.getElementById('g3-s').value.trim(),
+  };
+  if (!g.g1S || !g.g2S || !g.g3S) { alert('모든 목표를 입력해주세요.'); return; }
+  callServer('saveGoals', { studentId: currentStudent.id, studentName: currentStudent.name, goals: g }, function() {
+    showGoalDisplay(g);
+    alert('목표가 저장됐어요!');
+  });
+}
+
+function initRecordTab() {
+  const today = getTodayStr();
+  callServer('getTodayRecord', { studentId: currentStudent.id, date: today }, function(res) {
+    if (res && res.hasRecord) {
+      document.getElementById('already-recorded').style.display = '';
+      document.getElementById('record-form').style.display = 'none';
+      document.getElementById('today-record-view').innerHTML = renderRecordCard(res.record);
+    } else {
+      document.getElementById('already-recorded').style.display = 'none';
+      document.getElementById('record-form').style.display = '';
+      checks = {1: null, 2: null};
+      photoData = {1: '', 2: ''};
+      document.getElementById('rec-g1-memo').value = '';
+      document.getElementById('rec-g2-memo').value = '';
+      document.getElementById('thanks1').value = '';
+      document.getElementById('thanks2').value = '';
+      document.getElementById('thanks3').value = '';
+      document.getElementById('reflect1').value = '';
+      document.getElementById('reflect2').value = '';
+      document.getElementById('photo1-preview').style.display = 'none';
+      document.getElementById('photo2-preview').style.display = 'none';
+      resetCheckBtns();
+      checkWeeklyReflect(today);
+    }
+  });
+}
+
+function checkWeeklyReflect(today) {
+  callServer('needWeeklyReflect', { studentId: currentStudent.id, date: today }, function(res) {
+    document.getElementById('weekly-reflect-section').style.display = (res && res.needed) ? '' : 'none';
+  });
+}
+
+function resetCheckBtns() {
+  [1,2].forEach(n => {
+    ['done','partial','fail'].forEach(s => {
+      document.getElementById('ck'+n+'-'+s).className = 'check-btn';
+    });
+  });
+}
+
+function setCheck(num, state) {
+  checks[num] = state;
+  ['done','partial','fail'].forEach(s => {
+    document.getElementById('ck'+num+'-'+s).className = 'check-btn' + (s === state ? ' ' + state : '');
+  });
+}
+
+function handlePhoto(input, previewId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const max = 600;
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * max / w); w = max; }
+      else { w = Math.round(w * max / h); h = max; }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.5);
+      const preview = document.getElementById(previewId);
+      preview.src = compressed;
+      preview.style.display = 'block';
+      const idx = input.id === 'photo1' ? 1 : 2;
+      photoData[idx] = compressed.split(',')[1];
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveRecord() {
+  if (!checks[1] || !checks[2]) { alert('두 목표 모두 실천 여부를 선택해주세요.'); return; }
+  const t1 = document.getElementById('thanks1').value.trim();
+  if (!t1) { alert('감사일기를 최소 한 가지 이상 써주세요.'); return; }
+  const showReflect = document.getElementById('weekly-reflect-section').style.display !== 'none';
+  if (showReflect && !document.getElementById('reflect1').value.trim()) {
+    alert('이번 주 마무리 성찰을 작성해주세요.'); return;
+  }
+  const data = {
+    studentId: currentStudent.id,
+    studentName: currentStudent.name,
+    date: getTodayStr(),
+    g1Check: checks[1],
+    g1Memo: document.getElementById('rec-g1-memo').value.trim(),
+    g2Check: checks[2],
+    g2Memo: document.getElementById('rec-g2-memo').value.trim(),
+    thanks: [t1, document.getElementById('thanks2').value.trim(), document.getElementById('thanks3').value.trim()].filter(Boolean).join(' / '),
+    reflect1: showReflect ? document.getElementById('reflect1').value.trim() : '',
+    reflect2: showReflect ? document.getElementById('reflect2').value.trim() : '',
+    photo1Url: '',
+    photo2Url: ''
+  };
+
+  if (photoData[1] || photoData[2]) {
+    let uploaded = 0;
+    const total = (photoData[1] ? 1 : 0) + (photoData[2] ? 1 : 0);
+    function tryUpload(idx) {
+      if (!photoData[idx]) { checkDone(); return; }
+      callServer('uploadPhoto', {
+        studentId: currentStudent.id,
+        date: getTodayStr(),
+        photoIndex: idx,
+        photoData: photoData[idx],
+        mimeType: 'image/jpeg'
+      }, function(res) {
+        if (res && res.url) data['photo' + idx + 'Url'] = res.url;
+        checkDone();
+      });
+    }
+    function checkDone() {
+      uploaded++;
+      if (uploaded >= total) doSave(data);
+    }
+    if (photoData[1]) tryUpload(1);
+    if (photoData[2]) tryUpload(2);
+  } else {
+    doSave(data);
+  }
+}
+
+function doSave(data) {
+  callServer('saveRecord', data, function() {
+    alert('기록이 저장됐어요!');
+    initRecordTab();
+  });
+}
+
+function renderRecordCard(r) {
+  if (!r) return '<p class="empty">기록 없음</p>';
+  const ce = {'done':'✅','partial':'⚡','fail':'❌'};
+  return '<p style="font-size:12px;color:#aaa;margin-bottom:10px">' + formatDate(r.date) + '</p>' +
+    '<div class="goal-stripe"><div class="goal-label">목표 1 ' + (ce[r.g1Check]||'') + '</div><div class="goal-text">' + (r.g1Memo||'메모 없음') + '</div></div>' +
+    '<div class="goal-stripe g2"><div class="goal-label">목표 2 ' + (ce[r.g2Check]||'') + '</div><div class="goal-text">' + (r.g2Memo||'메모 없음') + '</div></div>' +
+    '<div class="goal-stripe g3"><div class="goal-label">감사일기</div><div class="goal-text">' + (r.thanks||'') + '</div></div>' +
+    (r.photo1Url ? '<a href="' + r.photo1Url + '" target="_blank"><img src="' + r.photo1Url + '" style="width:100%;border-radius:10px;margin-top:8px"></a>' : '') +
+    (r.photo2Url ? '<a href="' + r.photo2Url + '" target="_blank"><img src="' + r.photo2Url + '" style="width:100%;border-radius:10px;margin-top:6px"></a>' : '') +
+    (r.reflect1 ? '<div style="margin-top:10px;padding:10px;background:#f8faf8;border-radius:8px;font-size:13px"><strong style="color:#4a7c59">주차 성찰</strong><br>' + r.reflect1 + '</div>' : '');
+}
+
+function renderHistory(week) {
+  const chips = document.getElementById('hist-weeks');
+  if (!chips.children.length) {
+    chips.innerHTML = [1,2,3,4,5].map(w => '<span class="wchip' + (w===1?' sel':'') + '" onclick="selectHistWeek(this,' + w + ')">' + w + '주차</span>').join('');
+  }
+  callServer('getWeekRecords', { studentId: currentStudent.id, week: week }, function(res) {
+    const el = document.getElementById('history-content');
+    const recs = (res && res.records) || [];
+    if (!recs.length) { el.innerHTML = '<div class="empty">' + week + '주차 기록이 없어요</div>'; return; }
+    el.innerHTML = recs.map(r => '<div class="card">' + renderRecordCard(r) + '</div>').join('');
+  });
+}
+
+function selectHistWeek(el, w) {
+  document.querySelectorAll('#hist-weeks .wchip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  renderHistory(w);
+}
+
+function initFinalTab() {
+  callServer('getFinal', { studentId: currentStudent.id }, function(res) {
+    if (res && res.submitted) {
+      document.getElementById('final-submitted').style.display = '';
+      document.getElementById('final-form').style.display = 'none';
+      document.getElementById('final-view').innerHTML =
+        '<div class="goal-stripe"><div class="goal-label">나에게 일어난 변화</div><div class="goal-text">' + res.final.f1 + '</div></div>' +
+        '<div class="goal-stripe g2" style="margin-top:10px"><div class="goal-label">뇌과학적 성찰</div><div class="goal-text">' + res.final.f2 + '</div></div>' +
+        '<div class="goal-stripe g3" style="margin-top:10px"><div class="goal-label">유지할 한 가지</div><div class="goal-text">' + res.final.f3 + '</div></div>';
+    } else {
+      document.getElementById('final-submitted').style.display = 'none';
+      document.getElementById('final-form').style.display = '';
+    }
+  });
+}
+
+function submitFinal() {
+  const f1 = document.getElementById('final1').value.trim();
+  const f2 = document.getElementById('final2').value.trim();
+  const f3 = document.getElementById('final3').value.trim();
+  if (!f1 || !f2 || !f3) { alert('세 가지 모두 작성해주세요.'); return; }
+  if (!confirm('최종 성찰을 제출할까요? 제출 후 수정이 어려워요.')) return;
+  callServer('submitFinal', { studentId: currentStudent.id, studentName: currentStudent.name, f1: f1, f2: f2, f3: f3 }, function() {
+    alert('제출 완료! 수고했어요 🎉');
+    initFinalTab();
+  });
+}
+
+function profLogin() {
+  if (document.getElementById('prof-pw').value !== PROF_PW) { alert('비밀번호가 틀렸어요.'); return; }
+  go('screen-prof-main');
+}
+
+function loadProfDashboard() {
+  callServer('getAllStudents', {}, function(res) {
+    const students = (res && res.students) || [];
+    document.getElementById('p-total').textContent = students.length;
+    document.getElementById('p-records').textContent = students.reduce((s,st) => s + (st.recordCount||0), 0);
+    const el = document.getElementById('student-list');
+    if (!students.length) { el.innerHTML = '<div class="empty">아직 등록된 학생이 없어요</div>'; return; }
+    el.innerHTML = students.map(st => {
+      const pct = Math.min(100, Math.round((st.recordCount||0) / 25 * 100));
+      return '<div class="student-row" onclick="openDetail(\'' + st.id + '\',\'' + st.name + '\')">' +
+        '<div style="flex:1"><div class="s-name">' + st.name + ' <span style="font-size:12px;color:#aaa;font-weight:400">' + st.id + '</span></div>' +
+        '<div class="progress-wrap"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="s-sub">기록 ' + (st.recordCount||0) + '건 · ' + (st.finalSubmitted ? '최종성찰 제출' : '미제출') + '</div></div>' +
+        '<span style="color:#bbb;font-size:20px;margin-left:10px">›</span></div>';
+    }).join('');
+  });
+}
+
+function openDetail(id, name) {
+  currentDetailKey = { id: id, name: name };
+  currentDetailWeek = 1;
+  document.getElementById('detail-header').textContent = name + ' (' + id + ')';
+  setDetailTab('drec');
+  loadDetailGoals();
+  renderDetailWeekChips();
+  renderDetailRecords(1);
+  go('screen-detail');
+}
+
+function loadDetailGoals() {
+  callServer('getGoals', { studentId: currentDetailKey.id, studentName: currentDetailKey.name }, function(res) {
+    const el = document.getElementById('detail-goals');
+    if (res && res.goals) {
+      const g = res.goals;
+      el.innerHTML =
+        '<div class="goal-stripe"><div class="goal-label">목표1 — ' + g.g1Area + '</div><div class="goal-text">' + g.g1S + '</div></div>' +
+        '<div class="goal-stripe g2"><div class="goal-label">목표2 — ' + g.g2Area + '</div><div class="goal-text">' + g.g2S + '</div></div>' +
+        '<div class="goal-stripe g3"><div class="goal-label">목표3 — 감사일기</div><div class="goal-text">' + g.g3S + '</div></div>';
+    } else { el.innerHTML = '<p style="font-size:13px;color:#aaa">목표 미설정</p>'; }
+  });
+}
+
+function renderDetailWeekChips() {
+  document.getElementById('detail-week-chips').innerHTML = [1,2,3,4,5].map(w =>
+    '<span class="wchip' + (w===1?' sel':'') + '" onclick="selectDetailWeek(this,' + w + ')">' + w + '주차</span>'
+  ).join('');
+}
+
+function selectDetailWeek(el, w) {
+  document.querySelectorAll('#detail-week-chips .wchip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  currentDetailWeek = w;
+  renderDetailRecords(w);
+}
+
+function renderDetailRecords(week) {
+  callServer('getWeekRecords', { studentId: currentDetailKey.id, week: week }, function(res) {
+    const el = document.getElementById('detail-records');
+    const recs = (res && res.records) || [];
+    if (!recs.length) { el.innerHTML = '<div class="empty">' + week + '주차 기록 없음</div>'; return; }
+    el.innerHTML = recs.map(r => '<div class="card">' + renderRecordCard(r) + '</div>').join('');
+  });
+}
+
+function renderDetailFinal() {
+  callServer('getFinal', { studentId: currentDetailKey.id }, function(res) {
+    const el = document.getElementById('detail-final-content');
+    if (res && res.submitted) {
+      el.innerHTML = '<div class="card">' +
+        '<div class="goal-stripe"><div class="goal-label">나에게 일어난 변화</div><div class="goal-text">' + res.final.f1 + '</div></div>' +
+        '<div class="goal-stripe g2" style="margin-top:10px"><div class="goal-label">뇌과학적 성찰</div><div class="goal-text">' + res.final.f2 + '</div></div>' +
+        '<div class="goal-stripe g3" style="margin-top:10px"><div class="goal-label">유지할 한 가지</div><div class="goal-text">' + res.final.f3 + '</div></div></div>';
+    } else { el.innerHTML = '<div class="empty">최종 성찰 미제출</div>'; }
+  });
+}
+
+function loadScore() {
+  callServer('getScore', { studentId: currentDetailKey.id }, function(res) {
+    if (res && res.score) {
+      document.getElementById('sc1').value = res.score.sc1 || '';
+      document.getElementById('sc2').value = res.score.sc2 || '';
+      document.getElementById('sc3').value = res.score.sc3 || '';
+      document.getElementById('sc4').value = res.score.sc4 || '';
+      document.getElementById('sc5').value = res.score.sc5 || '';
+      document.getElementById('prof-feedback').value = res.score.feedback || '';
+      updateTotal();
+    }
+  });
+}
+
+function saveScore() {
+  const score = {
+    sc1: document.getElementById('sc1').value,
+    sc2: document.getElementById('sc2').value,
+    sc3: document.getElementById('sc3').value,
+    sc4: document.getElementById('sc4').value,
+    sc5: document.getElementById('sc5').value,
+    feedback: document.getElementById('prof-feedback').value.trim()
+  };
+  callServer('saveScore', { studentId: currentDetailKey.id, studentName: currentDetailKey.name, score: score }, function() {
+    alert('저장됐어요!');
+  });
+}
+
+function callServer(action, data, cb) {
+  const params = new URLSearchParams({ action: action, data: JSON.stringify(data) });
+  fetch(SCRIPT_URL + '?' + params.toString())
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      try { cb(JSON.parse(text)); }
+      catch(e) { cb(null); }
+    })
+    .catch(function(err) {
+      console.error(err);
+      alert('서버 연결 오류가 발생했어요.');
+    });
+}
+</script>
+</body>
+</html>
